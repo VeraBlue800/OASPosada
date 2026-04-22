@@ -13,19 +13,16 @@ servers:
 
 tags:
   - name: guests
-    description: Gestión de huéspedes
   - name: rooms
-    description: Gestión de habitaciones
   - name: reservations
-    description: Gestión de reservas
   - name: payments
-    description: Gestión de pagos
 
 paths:
 
   /guests:
     post:
       summary: Crear huésped
+      operationId: createGuest
       tags: [guests]
       requestBody:
         required: true
@@ -42,9 +39,12 @@ paths:
                 $ref: '#/components/schemas/GuestResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '500':
+          description: Error interno
 
     get:
       summary: Obtener huéspedes
+      operationId: getGuests
       tags: [guests]
       responses:
         '200':
@@ -55,16 +55,20 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/GuestResponse'
+        '500':
+          description: Error interno
 
   /guests/{guestId}:
+    parameters:
+      - $ref: '#/components/parameters/GuestId'
+
     get:
       summary: Obtener huésped por ID
+      operationId: getGuestById
       tags: [guests]
-      parameters:
-        - $ref: '#/components/parameters/GuestId'
       responses:
         '200':
-          description: OK
+          description: Huésped encontrado
           content:
             application/json:
               schema:
@@ -74,9 +78,8 @@ paths:
 
     put:
       summary: Actualizar huésped
+      operationId: updateGuest
       tags: [guests]
-      parameters:
-        - $ref: '#/components/parameters/GuestId'
       requestBody:
         required: true
         content:
@@ -85,18 +88,222 @@ paths:
               $ref: '#/components/schemas/Guest'
       responses:
         '200':
-          description: Actualizado
+          description: Huésped actualizado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuestResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
 
     delete:
       summary: Eliminar huésped
+      operationId: deleteGuest
       tags: [guests]
-      parameters:
-        - $ref: '#/components/parameters/GuestId'
       responses:
         '204':
-          description: Eliminado
+          description: Eliminado correctamente
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /rooms:
+    post:
+      summary: Crear habitación
+      operationId: createRoom
+      tags: [rooms]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Room'
+      responses:
+        '201':
+          description: Habitación creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+    get:
+      summary: Obtener habitaciones
+      operationId: getRooms
+      tags: [rooms]
+      responses:
+        '200':
+          description: Lista de habitaciones
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Room'
+
+  /rooms/{roomId}:
+    parameters:
+      - $ref: '#/components/parameters/RoomId'
+
+    get:
+      summary: Obtener habitación por ID
+      operationId: getRoomById
+      tags: [rooms]
+      responses:
+        '200':
+          description: Habitación encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      summary: Actualizar habitación
+      operationId: updateRoom
+      tags: [rooms]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Room'
+      responses:
+        '200':
+          description: Habitación actualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Room'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /reservations:
+    post:
+      summary: Crear reserva
+      operationId: createReservation
+      tags: [reservations]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Reservation'
+      responses:
+        '201':
+          description: Reserva creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+    get:
+      summary: Obtener reservas
+      operationId: getReservations
+      tags: [reservations]
+      responses:
+        '200':
+          description: Lista de reservas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Reservation'
+
+  /reservations/{reservationId}:
+    parameters:
+      - $ref: '#/components/parameters/ReservationId'
+
+    get:
+      summary: Obtener reserva por ID
+      operationId: getReservationById
+      tags: [reservations]
+      responses:
+        '200':
+          description: Reserva encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    put:
+      summary: Actualizar reserva
+      operationId: updateReservation
+      tags: [reservations]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Reservation'
+      responses:
+        '200':
+          description: Reserva actualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Reservation'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      summary: Cancelar reserva
+      operationId: deleteReservation
+      tags: [reservations]
+      responses:
+        '204':
+          description: Cancelada correctamente
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /payments:
+    post:
+      summary: Registrar pago
+      operationId: createPayment
+      tags: [payments]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Payment'
+      responses:
+        '201':
+          description: Pago registrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Payment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '422':
+          description: Pago rechazado
+
+    get:
+      summary: Obtener pagos
+      operationId: getPayments
+      tags: [payments]
+      responses:
+        '200':
+          description: Lista de pagos
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Payment'
 
 components:
 
@@ -107,6 +314,23 @@ components:
       required: true
       schema:
         type: string
+        example: "1"
+
+    RoomId:
+      name: roomId
+      in: path
+      required: true
+      schema:
+        type: string
+        example: "101"
+
+    ReservationId:
+      name: reservationId
+      in: path
+      required: true
+      schema:
+        type: string
+        example: "1"
 
   responses:
     BadRequest:
@@ -127,73 +351,53 @@ components:
 
     Guest:
       type: object
-      required:
-        - name
-        - phone
+      required: [name, phone]
       properties:
         name:
           type: string
-          minLength: 1
-          maxLength: 100
           example: "Juan Perez"
         phone:
           type: string
-          pattern: '^[0-9]{10}$'
           example: "4421234567"
         email:
           type: string
           format: email
-          minLength: 5
+          example: "juan@email.com"
 
     GuestResponse:
       allOf:
         - $ref: '#/components/schemas/Guest'
         - type: object
-          required: [id]
           properties:
             id:
               type: string
+              example: "1"
 
     Room:
       type: object
-      required:
-        - number
-        - type
-        - price
+      required: [number, type]
       properties:
         number:
           type: integer
-          minimum: 1
+          example: 101
         type:
           type: string
-          enum:
-            - Sencilla
-            - Doble
-            - Doble con aire acondicionado
+          enum: ["Sencilla", "Doble", "Doble con aire acondicionado"]
         price:
           type: number
-          minimum: 0
+          example: 1200
         status:
           type: string
-          enum:
-            - Available
-            - Occupied
-            - Unavailable
+          enum: ["Disponible", "Ocupada", "No disponible"]
 
     Reservation:
       type: object
-      required:
-        - guestId
-        - roomId
-        - checkIn
-        - checkOut
+      required: [guestId, roomId, checkIn]
       properties:
         guestId:
           type: string
-          minLength: 1
         roomId:
           type: string
-          minLength: 1
         checkIn:
           type: string
           format: date
@@ -203,17 +407,12 @@ components:
 
     Payment:
       type: object
-      required:
-        - reservationId
-        - amount
-        - method
-        - date
+      required: [reservationId, amount, method, date]
       properties:
         reservationId:
           type: string
         amount:
           type: number
-          minimum: 0
         method:
           type: string
           enum: [card, cash, transfer]
@@ -223,10 +422,7 @@ components:
 
     ApiError:
       type: object
-      required:
-        - code
-        - message
-        - timestamp
+      required: [code, message]
       properties:
         code:
           type: string
