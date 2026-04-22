@@ -26,7 +26,6 @@ paths:
   /guests:
     post:
       summary: Crear huésped
-      operationId: createGuest
       tags: [guests]
       requestBody:
         required: true
@@ -36,19 +35,16 @@ paths:
               $ref: '#/components/schemas/Guest'
       responses:
         '201':
-          description: Huésped creado exitosamente
-        '400':
-          description: Datos inválidos
+          description: Huésped creado
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApiError'
-        '500':
-          description: Error interno
+                $ref: '#/components/schemas/GuestResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
 
     get:
       summary: Obtener huéspedes
-      operationId: getGuests
       tags: [guests]
       responses:
         '200':
@@ -59,320 +55,73 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/GuestResponse'
-        '500':
-          description: Error interno
 
   /guests/{guestId}:
     get:
       summary: Obtener huésped por ID
-      operationId: getGuestId
       tags: [guests]
       parameters:
-        - name: guestId
-          in: path
-          required: true
-          schema:
-            type: string
-            example: "1"
+        - $ref: '#/components/parameters/GuestId'
       responses:
         '200':
-          description: Huésped encontrado
+          description: OK
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/GuestResponse'
         '404':
-          description: Huésped no encontrado
+          $ref: '#/components/responses/NotFound'
 
     put:
       summary: Actualizar huésped
-      operationId: updateGuest
       tags: [guests]
       parameters:
-        - name: guestId
-          in: path
-          required: true
-          schema:
-            type: string
-            example: "1"
+        - $ref: '#/components/parameters/GuestId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Guest'
       responses:
         '200':
-          description: Huésped actualizado
+          description: Actualizado
         '400':
-          description: Datos inválidos
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '500':
-          description: Error interno
+          $ref: '#/components/responses/BadRequest'
 
     delete:
       summary: Eliminar huésped
-      operationId: deleteGuest
       tags: [guests]
       parameters:
-        - name: guestId
-          in: path
-          required: true
-          schema:
-            type: string
-            example: "1"
+        - $ref: '#/components/parameters/GuestId'
       responses:
-        '200':
-          description: Huésped eliminado
-        '400':
-          description: Datos inválidos
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '500':
-          description: Error interno
-
-  /rooms:
-    post:
-      summary: Crear habitación
-      operationId: createRoom
-      tags: [rooms]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Room'
-      responses:
-        '201':
-          description: Habitación creada
-        '500':
-          description: Error interno
-
-    get:
-      summary: Obtener habitaciones
-      operationId: getRooms
-      tags: [rooms]
-      responses:
-        '200':
-          description: Lista de habitaciones
-        '500':
-          description: Error interno
-
-  /rooms/{roomId}:
-    get:
-      summary: Obtener habitación por ID
-      operationId: getRoomId
-      tags: [rooms]
-      parameters:
-        - name: roomId
-          in: path
-          required: true
-          schema:
-            type: string
-            example: "101"
-      responses:
-        '200':
-          description: Habitación encontrada
-        '201':
-          description: Reserva creada
-        '400':
-          description: Datos inválidos
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '404':
-          description: El huésped o la habitación especificada no existen
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '409':
-          description: Conflicto - La habitación no está disponible en las fechas seleccionadas
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '500':
-          description: Error interno del servidor
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-    put:
-      summary: Actualizar habitación
-      operationId: updateRoom
-      tags: [rooms]
-      parameters:
-        - name: roomId
-          in: path
-          required: true
-          schema:
-            type: string
-            example: "1"
-      responses:
-        '200':
-          description: Habitación actualizada
-        '400':
-          description: Datos inválidos
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '500':
-          description: Error interno
-    delete:
-      summary: Eliminar o dar de baja una habitación
-      operationId: deleteRoom
-      tags: [rooms]
-      parameters:
-        - name: roomId
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Habitación eliminada exitosamente
-        '404':
-          description: Habitación no encontrada
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '500':
-          description: Error interno del servidor
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-
-  /reservations:
-    post:
-      summary: Crear reserva
-      operationId: createReservation
-      tags: [reservations]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Reservation'
-      responses:
-        '201':
-          description: Reserva creada
-        '400':
-          description: Datos inválidos
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '500':
-          description: Error interno
-
-    get:
-      summary: Obtener reservas
-      operationId: getReservations
-      tags: [reservations]
-      responses:
-        '200':
-          description: Lista de reservas
-        '500':
-          description: Error interno
-
-  /reservations/{reservationId}:
-    get:
-      summary: Obtener reserva por ID
-      operationId: getReservationId
-      tags: [reservations]
-      parameters:
-        - name: reservationId
-          in: path
-          required: true
-          schema:
-            type: string
-            example: "1"
-      responses:
-        '200':
-          description: Reserva encontrada
-        '404':
-          description: Reserva no encontrada
-        '500':
-          description: Error interno
-
-    put:
-      summary: Actualizar reserva
-      operationId: updateReservation
-      tags: [reservations]
-      parameters:
-        - name: reservationId
-          in: path
-          required: true
-          schema:
-            type: string
-            example: "1"
-      responses:
-        '200':
-          description: Reserva actualizada
-        '400':
-          description: Datos inválidos
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ApiError'
-        '500':
-          description: Error interno
-
-    delete:
-      summary: Cancelar reserva
-      operationId: deleteReservation
-      tags: [reservations]
-      parameters:
-        - name: reservationId
-          in: path
-          required: true
-          schema:
-            type: string
-            example: "1"
-      responses:
-        '200':
-          description: Reserva cancelada
-        '404':
-          description: Reserva no encontrada
-        '500':
-          description: Error interno
-
-  /payments:
-    post:
-      summary: Registrar pago
-      operationId: createPayment
-      tags: [payments]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/Payment'
-      responses:
-        '201':
-          description: Pago registrado
-        '422':
-          description: Pago rechazado
-        '500':
-          description: Error interno
-
-
-    get:
-      summary: Obtener pagos
-      operationId: getPayments
-      tags: [payments]
-      responses:
-        '200':
-          description: Lista de pagos
-        '500':
-          description: Error interno
-
+        '204':
+          description: Eliminado
 
 components:
+
+  parameters:
+    GuestId:
+      name: guestId
+      in: path
+      required: true
+      schema:
+        type: string
+
+  responses:
+    BadRequest:
+      description: Datos inválidos
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
+
+    NotFound:
+      description: Recurso no encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ApiError'
 
   schemas:
 
@@ -384,7 +133,7 @@ components:
       properties:
         name:
           type: string
-          minLength: 2
+          minLength: 1
           maxLength: 100
           example: "Juan Perez"
         phone:
@@ -394,43 +143,42 @@ components:
         email:
           type: string
           format: email
-          example: "juan@email.com"
+          minLength: 5
 
     GuestResponse:
       allOf:
         - $ref: '#/components/schemas/Guest'
         - type: object
+          required: [id]
           properties:
             id:
               type: string
-              example: "1"
 
     Room:
       type: object
       required:
         - number
         - type
+        - price
       properties:
         number:
           type: integer
-          example: 101
+          minimum: 1
         type:
           type: string
           enum:
-            - "Sencilla"
-            - "Doble"
-            - "Doble con aire acondicionado"
-          example: "Double"
+            - Sencilla
+            - Doble
+            - Doble con aire acondicionado
         price:
           type: number
-          example: 1200
+          minimum: 0
         status:
           type: string
           enum:
-            - "Available"
-            - "Ocupated"
-            - "Unavailable"
-          example: "Available"
+            - Available
+            - Occupied
+            - Unavailable
 
     Reservation:
       type: object
@@ -438,21 +186,20 @@ components:
         - guestId
         - roomId
         - checkIn
+        - checkOut
       properties:
         guestId:
           type: string
-          example: "1"
+          minLength: 1
         roomId:
           type: string
-          example: "101"
+          minLength: 1
         checkIn:
           type: string
           format: date
-          example: "2026-03-10"
         checkOut:
           type: string
           format: date
-          example: "2026-03-12"
 
     Payment:
       type: object
@@ -464,26 +211,27 @@ components:
       properties:
         reservationId:
           type: string
-          example: "1"
         amount:
           type: number
-          example: 2400
+          minimum: 0
         method:
           type: string
-          example: "card"
+          enum: [card, cash, transfer]
         date:
           type: string
           format: date
 
     ApiError:
       type: object
+      required:
+        - code
+        - message
+        - timestamp
       properties:
         code:
           type: string
-          example: "INVALID_INPUT"
         message:
           type: string
-          example: "Datos inválidos"
         timestamp:
           type: string
           format: date-time
