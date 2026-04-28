@@ -6,9 +6,9 @@ import java.util.List;
  
 import com.ejemplo.api.model.Reservation;
  
-import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.ApplicationScoped; // <-- Importante
  
-@ApplicationScoped
+@ApplicationScoped // Le dice a Quarkus que gestione esta clase como un servicio
 public class ReservationService {
  
     public Reservation createReservation(Reservation reservation) {
@@ -18,20 +18,19 @@ public class ReservationService {
         Reservation response = new Reservation();
  
         // Mapeo de campos desde el Request
-        // NOTA: El modelo Reservation no tiene campo 'id' (no está en el OAS schema)
         response.setGuestId(reservation.getGuestId());
         response.setRoomId(reservation.getRoomId());
         response.setCheckIn(reservation.getCheckIn());
         response.setCheckOut(reservation.getCheckOut());
+        // NOTA: El modelo Reservation no tiene campo 'id' (no está en el OAS schema)
  
-        System.out.println("Service - Reserva creada para habitación: " + response.getRoomId());
         return response;
     }
  
     public List<Reservation> getAllReservations() {
         System.out.println("Service - Obteniendo todas las reservas");
  
-        // Simulación de consulta a base de datos
+        // Simulación de búsqueda en base de datos
         List<Reservation> reservations = new ArrayList<>();
  
         Reservation r1 = new Reservation();
@@ -48,7 +47,6 @@ public class ReservationService {
         r2.setCheckOut(LocalDate.of(2025, 6, 15));
         reservations.add(r2);
  
-        System.out.println("Service - Reservas encontradas: " + reservations.size());
         return reservations;
     }
  
@@ -56,12 +54,6 @@ public class ReservationService {
         System.out.println("Service - Buscando reserva con ID: " + reservationId);
  
         // Simulación de búsqueda en base de datos
-        // En un caso real: return repositorio.findById(reservationId)
-        // Simulamos que solo existe la reserva con ID "1"
-        if (!"1".equals(reservationId)) {
-            return null; // El Resource se encargará de responder 404
-        }
- 
         Reservation response = new Reservation();
         response.setGuestId("1");
         response.setRoomId("101");
@@ -74,32 +66,20 @@ public class ReservationService {
     public Reservation updateReservation(String reservationId, Reservation reservation) {
         System.out.println("Service - Actualizando reserva con ID: " + reservationId);
  
-        // Simulamos que solo existe la reserva con ID "1"
-        if (!"1".equals(reservationId)) {
-            return null; // El Resource se encargará de responder 404
-        }
- 
+        // Simulación de actualización en base de datos
         Reservation response = new Reservation();
         response.setGuestId(reservation.getGuestId());
         response.setRoomId(reservation.getRoomId());
         response.setCheckIn(reservation.getCheckIn());
         response.setCheckOut(reservation.getCheckOut());
  
-        System.out.println("Service - Reserva actualizada para habitación: " + response.getRoomId());
         return response;
     }
  
-    public boolean deleteReservation(String reservationId) {
+    public void deleteReservation(String reservationId) {
         System.out.println("Service - Cancelando reserva con ID: " + reservationId);
- 
-        // Simulamos que solo existe la reserva con ID "1"
-        if (!"1".equals(reservationId)) {
-            return false; // El Resource se encargará de responder 404
-        }
- 
+        // Simulación de eliminación en base de datos
         // En un caso real: repositorio.deleteById(reservationId)
-        System.out.println("Service - Reserva cancelada con ID: " + reservationId);
-        return true;
     }
 }
  
