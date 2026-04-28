@@ -105,6 +105,8 @@ paths:
       responses:
         '204':
           description: Eliminado correctamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -314,6 +316,7 @@ components:
       required: true
       schema:
         type: string
+        pattern: "^[0-9]+$"
         example: "1"
 
     RoomId:
@@ -351,17 +354,20 @@ components:
 
     Guest:
       type: object
-      required: [name, phone]
+      required: [name, phone,email]
       properties:
         name:
           type: string
+          pattern: "^[a-zA-Z\\s]+$"
           example: "Juan Perez"
         phone:
           type: string
+          pattern: "^[0-9]{10}$"
           example: "4421234567"
         email:
           type: string
           format: email
+          pattern: "^[a-zA-Z0-9._%+-]+@gmail\\.com$"
           example: "juan@email.com"
 
     GuestResponse:
@@ -411,14 +417,21 @@ components:
       properties:
         reservationId:
           type: string
+          pattern: "^[0-9]+$"
+          example: "1"
         amount:
           type: number
+          exclusiveMinimum: true
+          minimum: 0
+          example: 1200.50
         method:
           type: string
           enum: [card, cash, transfer]
+          example: "card"
         date:
           type: string
           format: date
+          example: "2026-04-28"
 
     ApiError:
       type: object
