@@ -39,7 +39,7 @@ import org.hibernate.validator.constraints.*;
   Guest.JSON_PROPERTY_PHONE,
   Guest.JSON_PROPERTY_EMAIL
 })
-@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-04-22T20:27:17.941286200-06:00[America/Mexico_City]")
+@jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-04-28T11:41:17.494294600-06:00[America/Mexico_City]")
 public class Guest {
   public static final String JSON_PROPERTY_NAME = "name";
   private String name;
@@ -64,7 +64,7 @@ public class Guest {
   **/
   @jakarta.annotation.Nonnull
   @NotNull
-
+ @Pattern(regexp="^[a-zA-Z\\s]+$")
   @JsonProperty(JSON_PROPERTY_NAME)
   @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
@@ -91,7 +91,7 @@ public class Guest {
   **/
   @jakarta.annotation.Nonnull
   @NotNull
-
+ @Pattern(regexp="^[0-9]{10}$")
   @JsonProperty(JSON_PROPERTY_PHONE)
   @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
@@ -116,10 +116,11 @@ public class Guest {
    * Get email
    * @return email
   **/
-  @jakarta.annotation.Nullable
-
+  @jakarta.annotation.Nonnull
+  @NotNull
+ @Pattern(regexp="^[a-zA-Z0-9._%+-]+@gmail\\.com$")
   @JsonProperty(JSON_PROPERTY_EMAIL)
-  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
 
   public String getEmail() {
     return email;
@@ -127,7 +128,7 @@ public class Guest {
 
 
   @JsonProperty(JSON_PROPERTY_EMAIL)
-  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  @JsonInclude(value = JsonInclude.Include.ALWAYS)
   public void setEmail(String email) {
     this.email = email;
   }
@@ -227,4 +228,6 @@ public class Guest {
     return joiner.toString();
   }
 }
+
+
 
