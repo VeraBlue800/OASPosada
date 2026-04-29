@@ -1,7 +1,7 @@
-package com.ejemplo.api.resource;
+package com.posada.api.resource;
  
-import com.ejemplo.api.model.Payment;
-import com.ejemplo.api.service.PaymentService;
+import com.posada.api.model.Payment;
+import com.posada.api.service.PaymentService;
  
 import java.util.List;
  
