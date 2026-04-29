@@ -1,4 +1,4 @@
-package com.ejemplo.api.service;
+package com.posada.api.service;
  
 import java.math.BigDecimal;
 import java.time.LocalDate;
