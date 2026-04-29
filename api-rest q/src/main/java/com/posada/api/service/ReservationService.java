@@ -4,7 +4,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ejemplo.api.model.Reservation;
+import com.posada.api.model.Reservation;
 
 import jakarta.enterprise.context.ApplicationScoped; // <-- Importante
 

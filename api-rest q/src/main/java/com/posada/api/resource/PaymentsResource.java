@@ -18,7 +18,7 @@ import jakarta.ws.rs.core.Response;
 @Path("/api/v1") // Prefijo base de la API
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class PaymentResource {
+public class PaymentsResource {
  
     // Inyección de dependencias con CDI
     @Inject

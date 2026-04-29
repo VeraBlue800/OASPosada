@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
  
-import com.ejemplo.api.model.Payment;
+import com.posada.api.model.Payment;
  
 import jakarta.enterprise.context.ApplicationScoped; // <-- Importante
  
@@ -16,7 +16,7 @@ public class PaymentService {
         System.out.println("Service - Pago recibido para reserva: " + payment.getReservationId());
  
         // Validación del método de pago (el OAS define: card, cash, transfer)
-        String method = payment.getMethod();
+        String method = payment.getMethod().getValue();
         if (!method.equals("card") && !method.equals("cash") && !method.equals("transfer")) {
             throw new jakarta.ws.rs.BadRequestException(
                 "Método de pago inválido: " + method + ". Valores permitidos: card, cash, transfer");
@@ -45,14 +45,14 @@ public class PaymentService {
         Payment p1 = new Payment();
         p1.setReservationId("1");
         p1.setAmount(new BigDecimal("1200.00"));
-        p1.setMethod("cash");
+        p1.setMethod(Payment.MethodEnum.fromValue("cash"));
         p1.setDate(LocalDate.of(2025, 6, 1));
         payments.add(p1);
  
         Payment p2 = new Payment();
         p2.setReservationId("2");
         p2.setAmount(new BigDecimal("2400.00"));
-        p2.setMethod("card");
+        p2.setMethod(Payment.MethodEnum.fromValue("card"));
         p2.setDate(LocalDate.of(2025, 6, 10));
         payments.add(p2);
  
