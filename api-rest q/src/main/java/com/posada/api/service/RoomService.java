@@ -55,13 +55,22 @@ public class RoomService {
     }
 
     public Room getRoomById(String roomId) {
-        // Validar que el ID sea numérico
+        // Validar que el ID sea numérico → 400
         if (roomId == null || !roomId.matches("\\d+")) {
             throw new jakarta.ws.rs.BadRequestException("El ID debe ser un número entero válido: " + roomId);
         }
 
+        // Simulación: solo existen las rooms 101 y 102
+        List<Integer> roomsExistentes = List.of(101, 102);
+        int id = Integer.parseInt(roomId);
+
+        if (!roomsExistentes.contains(id)) {
+            throw new jakarta.ws.rs.NotFoundException("Habitación no encontrada con ID: " + roomId); // → 404
+        }
+
+        // Simular que encontró la room
         Room response = new Room();
-        response.setNumber(Integer.parseInt(roomId));
+        response.setNumber(id);
         response.setType(Room.TypeEnum.SENCILLA);
         response.setPrice(new BigDecimal("800.0"));
         response.setStatus(Room.StatusEnum.DISPONIBLE);
@@ -72,6 +81,14 @@ public class RoomService {
     public Room updateRoom(String roomId, Room room) {
         if (roomId == null || !roomId.matches("\\d+")) {
             throw new jakarta.ws.rs.BadRequestException("El ID debe ser un número entero válido: " + roomId);
+        }
+
+        // Simulación: solo existen las rooms 101 y 102
+        List<Integer> roomsExistentes = List.of(101, 102);
+        int id = Integer.parseInt(roomId);
+
+        if (!roomsExistentes.contains(id)) {
+            throw new jakarta.ws.rs.NotFoundException("Habitación no encontrada con ID: " + roomId); // → 404
         }
 
         Room response = new Room();
