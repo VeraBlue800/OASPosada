@@ -3,6 +3,7 @@ package com.posada.api.service;
 import com.posada.api.model.Guest;
 import com.posada.api.model.GuestResponse;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.ArrayList;
@@ -16,7 +17,25 @@ public class GuestService {
 
     // Simulación de base de datos en memoria
     private final Map<String, GuestResponse> database = new HashMap<>();
-    private final AtomicInteger idCounter = new AtomicInteger(1);
+    private final AtomicInteger idCounter = new AtomicInteger(3); // Empieza en 3 para no chocar con los precargados
+
+    // Datos precargados — disponibles desde que arranca la app
+    @PostConstruct
+    void init() {
+        GuestResponse g1 = new GuestResponse();
+        g1.setId("1");
+        g1.setName("Juan Perez");
+        g1.setPhone("4421234567");
+        g1.setEmail("juan@gmail.com");
+        database.put("1", g1);
+
+        GuestResponse g2 = new GuestResponse();
+        g2.setId("2");
+        g2.setName("Maria Lopez");
+        g2.setPhone("4429876543");
+        g2.setEmail("maria@gmail.com");
+        database.put("2", g2);
+    }
 
     // POST — Crear huésped
     public GuestResponse createGuest(Guest guest) {
@@ -52,7 +71,7 @@ public class GuestService {
         System.out.println("Service - Actualizando huésped con ID: " + guestId);
 
         if (!database.containsKey(guestId)) {
-            return null; // El resource devolverá 404
+            return null;
         }
 
         GuestResponse updated = new GuestResponse();
@@ -71,7 +90,7 @@ public class GuestService {
         System.out.println("Service - Eliminando huésped con ID: " + guestId);
 
         if (!database.containsKey(guestId)) {
-            return false; // El resource devolverá 404
+            return false;
         }
 
         database.remove(guestId);
