@@ -1,6 +1,6 @@
-package com.ejemplo.api.resource;
-import com.ejemplo.api.model.Reservation;
-import com.ejemplo.api.service.ReservationService;
+package com.posada.api.resource;
+import com.posada.api.model.Reservation;
+import com.posada.api.service.ReservationService;
 import java.util.List;
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
