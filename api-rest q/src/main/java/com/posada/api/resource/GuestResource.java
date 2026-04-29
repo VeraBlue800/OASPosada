@@ -1,3 +1,4 @@
+//Prueba
 package com.posada.api.resource;
 
 import com.posada.api.model.ApiError;
