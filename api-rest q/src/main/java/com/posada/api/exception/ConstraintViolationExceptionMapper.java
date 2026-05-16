@@ -6,9 +6,12 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
+import org.jboss.logging.Logger;
 
 @Provider
 public class ConstraintViolationExceptionMapper implements ExceptionMapper<ConstraintViolationException> {
+
+    private static final Logger LOG = Logger.getLogger(ConstraintViolationExceptionMapper.class);
 
     @Override
     public Response toResponse(ConstraintViolationException exception) {
@@ -38,6 +41,8 @@ public class ConstraintViolationExceptionMapper implements ExceptionMapper<Const
                 })
                 .reduce((a, b) -> a + " | " + b)
                 .orElse("Datos inválidos");
+
+        LOG.warnf("400 Validation Error: %s", messages);
 
         ApiError error = ApiErrorBuilder.build("VALIDATION_ERROR", messages);
 

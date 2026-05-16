@@ -14,11 +14,14 @@ import jakarta.ws.rs.core.Response;
 import jakarta.inject.Inject;
 import java.util.List;
 import com.posada.api.service.RoomService;
+import org.jboss.logging.Logger;
 
 @Path("/api/v1")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class RoomResource {
+
+    private static final Logger LOG = Logger.getLogger(RoomResource.class);
 
     @Inject
     RoomService roomService;
@@ -26,9 +29,9 @@ public class RoomResource {
     @POST
     @Path("/rooms")
     public Response createRoom(@Valid Room roomRequest) {
-        System.out.println("Resource - Room recibida: " + roomRequest.getNumber());
+        LOG.infof("POST /rooms - Solicitud para crear habitación número: %d", roomRequest.getNumber());
         Room roomResponse = roomService.createRoom(roomRequest);
-        System.out.println("Resource - Room creada: " + roomResponse.getNumber());
+        LOG.infof("Resource - Room creada: %d", roomResponse.getNumber());
         return Response.status(Response.Status.CREATED)
                 .entity("{\"message\": \"Habitación " + roomResponse.getNumber() + " creada\"}")
                 .type(MediaType.APPLICATION_JSON)
@@ -38,27 +41,27 @@ public class RoomResource {
     @GET
     @Path("/rooms")
     public Response getRooms() {
-        System.out.println("Resource - Obteniendo lista de rooms");
+        LOG.info("GET /rooms - Obteniendo lista de rooms");
         List<Room> rooms = roomService.getRooms();
-        System.out.println("Resource - Rooms encontradas: " + rooms.size());
+        LOG.infof("Resource - Rooms encontradas: %d", rooms.size());
         return Response.ok(rooms).build();
     }
 
     @GET
     @Path("/rooms/{roomId}")
     public Response getRoomById(@PathParam("roomId") String roomId) {
-        System.out.println("Resource - Buscando Room con ID: " + roomId);
+        LOG.infof("Resource - Buscando Room con ID: %s", roomId);
         Room roomResponse = roomService.getRoomById(roomId);
-        System.out.println("Resource - Room encontrada: " + roomResponse.getNumber());
+        LOG.infof("Resource - Room encontrada: %d", roomResponse.getNumber());
         return Response.ok(roomResponse).build();
     }
 
     @PUT
     @Path("/rooms/{roomId}")
     public Response updateRoom(@PathParam("roomId") String roomId, @Valid Room roomRequest) {
-        System.out.println("Resource - Actualizando Room con ID: " + roomId);
+        LOG.infof("Resource - Actualizando Room con ID: %s", roomId);
         Room roomResponse = roomService.updateRoom(roomId, roomRequest);
-        System.out.println("Resource - Room actualizada: " + roomResponse.getNumber());
+        LOG.infof("Resource - Room actualizada: %d", roomResponse.getNumber());
         return Response.ok()
                 .entity("{\"message\": \"Habitación " + roomResponse.getNumber() + " actualizada correctamente\"}")
                 .type(MediaType.APPLICATION_JSON)
