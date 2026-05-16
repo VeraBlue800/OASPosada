@@ -29,7 +29,10 @@ public class RoomResource {
         System.out.println("Resource - Room recibida: " + roomRequest.getNumber());
         Room roomResponse = roomService.createRoom(roomRequest);
         System.out.println("Resource - Room creada: " + roomResponse.getNumber());
-        return Response.status(Response.Status.CREATED).entity(roomResponse).build();
+        return Response.status(Response.Status.CREATED)
+                .entity("{\"message\": \"Habitación " + roomResponse.getNumber() + " creada\"}")
+                .type(MediaType.APPLICATION_JSON)
+                .build();
     }
 
     @GET
@@ -56,6 +59,9 @@ public class RoomResource {
         System.out.println("Resource - Actualizando Room con ID: " + roomId);
         Room roomResponse = roomService.updateRoom(roomId, roomRequest);
         System.out.println("Resource - Room actualizada: " + roomResponse.getNumber());
-        return Response.ok(roomResponse).build();
+        return Response.ok()
+                .entity("{\"message\": \"Habitación " + roomResponse.getNumber() + " actualizada correctamente\"}")
+                .type(MediaType.APPLICATION_JSON)
+                .build();
     }
 }

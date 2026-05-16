@@ -2,7 +2,7 @@ openapi: 3.0.4
 info:
   title: Posada
   description: API REST para gestión de huéspedes, habitaciones, reservas y pagos de un hotel
-  version: 1.0.0
+  version: 1.0.1
   contact:
     name: Guadalupe Trejo
     email: l22140776@queretaro.tecnm.mx
@@ -127,9 +127,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Room'
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Habitación 101 creada"
         '400':
           $ref: '#/components/responses/BadRequest'
+        '409':
+          description: Habitación ya existe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
 
     get:
       summary: Obtener habitaciones
@@ -181,7 +191,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Room'
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Habitación 101 actualizada correctamente"
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':

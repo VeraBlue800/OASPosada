@@ -1,6 +1,8 @@
 C:\Users\lupit\Desktop\OASPosada\api-rest q\src\main\java\com\posada\api\exception\ApiErrorBuilder.java
 C:\Users\lupit\Desktop\OASPosada\api-rest q\src\main\java\com\posada\api\exception\BadRequestExceptionMapper.java
+C:\Users\lupit\Desktop\OASPosada\api-rest q\src\main\java\com\posada\api\exception\ClientErrorExceptionMapper.java
 C:\Users\lupit\Desktop\OASPosada\api-rest q\src\main\java\com\posada\api\exception\ConstraintViolationExceptionMapper.java
+C:\Users\lupit\Desktop\OASPosada\api-rest q\src\main\java\com\posada\api\exception\JsonExceptionMapper.java
 C:\Users\lupit\Desktop\OASPosada\api-rest q\src\main\java\com\posada\api\exception\NotFoundExceptionMapper.java
 C:\Users\lupit\Desktop\OASPosada\api-rest q\src\main\java\com\posada\api\GreetingResource.java
 C:\Users\lupit\Desktop\OASPosada\api-rest q\src\main\java\com\posada\api\model\ApiError.java
@@ -10,11 +12,9 @@ C:\Users\lupit\Desktop\OASPosada\api-rest q\src\main\java\com\posada\api\model\P
 C:\Users\lupit\Desktop\OASPosada\api-rest q\src\main\java\com\posada\api\model\Reservation.java
 C:\Users\lupit\Desktop\OASPosada\api-rest q\src\main\java\com\posada\api\model\Room.java
 C:\Users\lupit\Desktop\OASPosada\api-rest q\src\main\java\com\posada\api\resource\GuestResource.java
-C:\Users\lupit\Desktop\OASPosada\api-rest q\src\main\java\com\posada\api\resource\JsonExceptionMapper.java
 C:\Users\lupit\Desktop\OASPosada\api-rest q\src\main\java\com\posada\api\resource\PaymentsResource.java
 C:\Users\lupit\Desktop\OASPosada\api-rest q\src\main\java\com\posada\api\resource\ReservationResource.java
 C:\Users\lupit\Desktop\OASPosada\api-rest q\src\main\java\com\posada\api\resource\RoomResource.java
-C:\Users\lupit\Desktop\OASPosada\api-rest q\src\main\java\com\posada\api\resource\ValidationExceptionMapper.java
 C:\Users\lupit\Desktop\OASPosada\api-rest q\src\main\java\com\posada\api\service\GuestService.java
 C:\Users\lupit\Desktop\OASPosada\api-rest q\src\main\java\com\posada\api\service\PaymentService.java
 C:\Users\lupit\Desktop\OASPosada\api-rest q\src\main\java\com\posada\api\service\ReservationService.java
