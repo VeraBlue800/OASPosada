@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-posada-volumes
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: posada_db
+      MYSQL_USER: posada_user
+      MYSQL_PASSWORD: posada_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./init-scripts:/docker-entrypoint-initdb.d:ro
+    networks:
+      - posada-network
+
+volumes:
+  mysql-data:
+
+networks:
+  posada-network:
+    driver: bridge
