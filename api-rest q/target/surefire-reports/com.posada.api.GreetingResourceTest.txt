@@ -1,4 +1,0 @@
--------------------------------------------------------------------------------
-Test set: com.posada.api.GreetingResourceTest
--------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 2.036 s -- in com.posada.api.GreetingResourceTest

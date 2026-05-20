@@ -1,4 +1,3 @@
-//Prueba
 package com.posada.api.resource;
 
 import com.posada.api.model.ApiError;
@@ -12,6 +11,7 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.jboss.logging.Logger;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -22,10 +22,11 @@ import java.util.List;
 @jakarta.validation.executable.ValidateOnExecution
 public class GuestResource {
 
+    private static final Logger LOG = Logger.getLogger(GuestResource.class);
+
     @Inject
     GuestService guestService;
 
-    // Método auxiliar para construir un ApiError 404 con mensaje personalizado
     private Response notFound(String guestId) {
         ApiError error = new ApiError();
         error.setCode("GUEST_NOT_FOUND");
@@ -34,76 +35,79 @@ public class GuestResource {
         return Response.status(Response.Status.NOT_FOUND).entity(error).build();
     }
 
-    // POST /guests — Crear huésped
     @POST
     @Path("/guests")
     public Response createGuest(@Valid Guest guestRequest) {
-        System.out.println("Resource - Huésped recibido: " + guestRequest.getName());
+        LOG.infof("POST /guests - Solicitud para crear huésped: %s", guestRequest.getName());
 
         GuestResponse guestResponse = guestService.createGuest(guestRequest);
 
+        LOG.infof("Resource - Huésped creado con ID: %s", guestResponse.getId());
         return Response.status(Response.Status.CREATED).entity(guestResponse).build();
     }
 
-    // GET /guests — Obtener todos los huéspedes
     @GET
     @Path("/guests")
     public Response getGuests() {
-        System.out.println("Resource - Obteniendo lista de huéspedes");
+        LOG.info("GET /guests - Obteniendo lista de huéspedes");
 
         List<GuestResponse> guests = guestService.getAllGuests();
 
+        LOG.infof("Resource - Huéspedes encontrados: %d", guests.size());
         return Response.ok(guests).build();
     }
 
-    // GET /guests/{guestId} — Obtener huésped por ID
     @GET
     @Path("/guests/{guestId}")
     public Response getGuestById(
             @Pattern(regexp = "^[0-9]+$", message = "El guestId debe ser un número")
             @PathParam("guestId") String guestId) {
-        System.out.println("Resource - Buscando huésped con ID: " + guestId);
+        LOG.infof("GET /guests/%s - Buscando huésped", guestId);
 
         GuestResponse guestResponse = guestService.getGuestById(guestId);
 
         if (guestResponse == null) {
+            LOG.warnf("Resource - Huésped no encontrado con ID: %s", guestId);
             return notFound(guestId);
         }
 
+        LOG.infof("Resource - Huésped encontrado: %s", guestResponse.getName());
         return Response.ok(guestResponse).build();
     }
 
-    // PUT /guests/{guestId} — Actualizar huésped
     @PUT
     @Path("/guests/{guestId}")
     public Response updateGuest(
             @Pattern(regexp = "^[0-9]+$", message = "El guestId debe ser un número")
             @PathParam("guestId") String guestId, @Valid Guest guestRequest) {
-        System.out.println("Resource - Actualizando huésped con ID: " + guestId);
+        LOG.infof("PUT /guests/%s - Actualizando huésped", guestId);
 
         GuestResponse guestResponse = guestService.updateGuest(guestId, guestRequest);
 
         if (guestResponse == null) {
+            LOG.warnf("Resource - Huésped no encontrado con ID: %s", guestId);
             return notFound(guestId);
         }
 
+        LOG.infof("Resource - Huésped actualizado: %s", guestResponse.getName());
         return Response.ok(guestResponse).build();
     }
 
-    // DELETE /guests/{guestId} — Eliminar huésped
     @DELETE
     @Path("/guests/{guestId}")
     public Response deleteGuest(
             @Pattern(regexp = "^[0-9]+$", message = "El guestId debe ser un número")
             @PathParam("guestId") String guestId) {
-        System.out.println("Resource - Eliminando huésped con ID: " + guestId);
+        LOG.infof("DELETE /guests/%s - Eliminando huésped", guestId);
 
         boolean deleted = guestService.deleteGuest(guestId);
 
         if (!deleted) {
+            LOG.warnf("Resource - Huésped no encontrado con ID: %s", guestId);
             return notFound(guestId);
         }
 
-        return Response.noContent().build(); // 204 No Content
+        LOG.infof("Resource - Huésped eliminado con ID: %s", guestId);
+        return Response.noContent().build();
     }
 }
