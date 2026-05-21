@@ -3,95 +3,121 @@ package com.posada.api.service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
 import com.posada.api.model.Reservation;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.ws.rs.core.Response;
+import org.jboss.logging.Logger;
 
-import jakarta.enterprise.context.ApplicationScoped; // <-- Importante
-
-@ApplicationScoped // Le dice a Quarkus que gestione esta clase como un servicio
+@ApplicationScoped
 public class ReservationService {
 
-    private static final List<String> reservasExistentes = List.of("1", "2");
+    private static final Logger LOG = Logger.getLogger(ReservationService.class);
+
+    private final List<Reservation> reservations = new ArrayList<>(List.of(
+            crearReservation("1", "101", LocalDate.of(2025, 6, 1), LocalDate.of(2025, 6, 5)),
+            crearReservation("2", "102", LocalDate.of(2025, 6, 10), LocalDate.of(2025, 6, 15))
+    ));
+
+    private Reservation crearReservation(String guestId, String roomId, LocalDate checkIn, LocalDate checkOut) {
+        Reservation r = new Reservation();
+        r.setGuestId(guestId);
+        r.setRoomId(roomId);
+        r.setCheckIn(checkIn);
+        r.setCheckOut(checkOut);
+        return r;
+    }
 
     public Reservation createReservation(Reservation reservation) {
-        System.out.println("Service - Reserva recibida para huésped: " + reservation.getGuestId());
+        LOG.infof("Service - Intentando crear reserva para huésped: %s", reservation.getGuestId());
 
-        // Simulamos la persistencia y generación de datos del sistema
-        Reservation response = new Reservation();
+        boolean exists = reservations.stream()
+                .anyMatch(r -> r.getGuestId().equals(reservation.getGuestId())
+                        && r.getRoomId().equals(reservation.getRoomId())
+                        && r.getCheckIn().equals(reservation.getCheckIn()));
+        if (exists) {
+            LOG.warnf("Service - Conflicto: ya existe una reserva para huésped %s en habitación %s",
+                    reservation.getGuestId(), reservation.getRoomId());
+            throw new jakarta.ws.rs.ClientErrorException(
+                    "Ya existe una reserva para este huésped en esa habitación en esa fecha",
+                    Response.Status.CONFLICT);
+        }
 
-        // Mapeo de campos desde el Request
-        response.setGuestId(reservation.getGuestId());
-        response.setRoomId(reservation.getRoomId());
-        response.setCheckIn(reservation.getCheckIn());
-        response.setCheckOut(reservation.getCheckOut());
-        // NOTA: El modelo Reservation no tiene campo 'id' (no está en el OAS schema)
+        Reservation response = crearReservation(
+                reservation.getGuestId(),
+                reservation.getRoomId(),
+                reservation.getCheckIn(),
+                reservation.getCheckOut());
 
+        reservations.add(response);
+
+        LOG.infof("Service - Reserva creada para habitación: %s", response.getRoomId());
         return response;
     }
 
     public List<Reservation> getAllReservations() {
-        System.out.println("Service - Obteniendo todas las reservas");
-
-        // Simulación de búsqueda en base de datos
-        List<Reservation> reservations = new ArrayList<>();
-
-        Reservation r1 = new Reservation();
-        r1.setGuestId("1");
-        r1.setRoomId("101");
-        r1.setCheckIn(LocalDate.of(2025, 6, 1));
-        r1.setCheckOut(LocalDate.of(2025, 6, 5));
-        reservations.add(r1);
-
-        Reservation r2 = new Reservation();
-        r2.setGuestId("2");
-        r2.setRoomId("102");
-        r2.setCheckIn(LocalDate.of(2025, 6, 10));
-        r2.setCheckOut(LocalDate.of(2025, 6, 15));
-        reservations.add(r2);
-
-        return reservations;
+        LOG.infof("Service - Obteniendo todas las reservas, total: %d", reservations.size());
+        return new ArrayList<>(reservations);
     }
 
     public Reservation getReservationById(String reservationId) {
-        System.out.println("Service - Buscando reserva con ID: " + reservationId);
+        LOG.infof("Service - Buscando reserva con ID: %s", reservationId);
 
-        if (!reservasExistentes.contains(reservationId)) {
-            throw new jakarta.ws.rs.NotFoundException(
-                    "Reserva no encontrada con ID: " + reservationId);
+        if (reservationId == null || !reservationId.matches("\\d+")) {
+            LOG.warnf("Service - ID inválido recibido: %s", reservationId);
+            throw new jakarta.ws.rs.BadRequestException("El ID debe ser un número entero válido");
         }
 
-        Reservation response = new Reservation();
-        response.setGuestId("1");
-        response.setRoomId("101");
-        response.setCheckIn(LocalDate.of(2025, 6, 1));
-        response.setCheckOut(LocalDate.of(2025, 6, 5));
-        return response;
+        return reservations.stream()
+                .filter(r -> r.getGuestId().equals(reservationId))
+                .findFirst()
+                .orElseThrow(() -> {
+                    LOG.warnf("Service - Reserva no encontrada con ID: %s", reservationId);
+                    return new jakarta.ws.rs.NotFoundException("Reserva no encontrada con ID: " + reservationId);
+                });
     }
 
     public Reservation updateReservation(String reservationId, Reservation reservation) {
-        System.out.println("Service - Actualizando reserva con ID: " + reservationId);
+        LOG.infof("Service - Intentando actualizar reserva con ID: %s", reservationId);
 
-        if (!reservasExistentes.contains(reservationId)) {
-            throw new jakarta.ws.rs.NotFoundException(
-                    "Reserva no encontrada con ID: " + reservationId);
+        if (reservationId == null || !reservationId.matches("\\d+")) {
+            LOG.warnf("Service - ID inválido recibido: %s", reservationId);
+            throw new jakarta.ws.rs.BadRequestException("El ID debe ser un número entero válido: " + reservationId);
         }
 
-        Reservation response = new Reservation();
-        response.setGuestId(reservation.getGuestId());
-        response.setRoomId(reservation.getRoomId());
-        response.setCheckIn(reservation.getCheckIn());
-        response.setCheckOut(reservation.getCheckOut());
-        return response;
+        Reservation existing = reservations.stream()
+                .filter(r -> r.getGuestId().equals(reservationId))
+                .findFirst()
+                .orElseThrow(() -> {
+                    LOG.warnf("Service - Reserva no encontrada con ID: %s", reservationId);
+                    return new jakarta.ws.rs.NotFoundException("Reserva no encontrada con ID: " + reservationId);
+                });
+
+        existing.setGuestId(reservation.getGuestId());
+        existing.setRoomId(reservation.getRoomId());
+        existing.setCheckIn(reservation.getCheckIn());
+        existing.setCheckOut(reservation.getCheckOut());
+
+        LOG.infof("Service - Reserva %s actualizada correctamente", reservationId);
+        return existing;
     }
 
     public void deleteReservation(String reservationId) {
-        System.out.println("Service - Cancelando reserva con ID: " + reservationId);
+        LOG.infof("Service - Intentando cancelar reserva con ID: %s", reservationId);
 
-        if (!reservasExistentes.contains(reservationId)) {
-            throw new jakarta.ws.rs.NotFoundException(
-                    "Reserva no encontrada con ID: " + reservationId);
+        if (reservationId == null || !reservationId.matches("\\d+")) {
+            LOG.warnf("Service - ID inválido recibido: %s", reservationId);
+            throw new jakarta.ws.rs.BadRequestException("El ID debe ser un número entero válido: " + reservationId);
         }
 
-        System.out.println("Service - Reserva cancelada con ID: " + reservationId);
+        Reservation existing = reservations.stream()
+                .filter(r -> r.getGuestId().equals(reservationId))
+                .findFirst()
+                .orElseThrow(() -> {
+                    LOG.warnf("Service - Reserva no encontrada con ID: %s", reservationId);
+                    return new jakarta.ws.rs.NotFoundException("Reserva no encontrada con ID: " + reservationId);
+                });
+
+        reservations.remove(existing);
+        LOG.infof("Service - Reserva %s cancelada correctamente", reservationId);
     }
 }

@@ -218,9 +218,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Reservation'
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Reserva para habitación 101 creada"
         '400':
           $ref: '#/components/responses/BadRequest'
+        '409':
+          description: Reserva ya existe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiError'
 
     get:
       summary: Obtener reservas
@@ -270,7 +280,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Reservation'
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Reserva 1 actualizada correctamente"
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -281,8 +295,16 @@ paths:
       operationId: deleteReservation
       tags: [reservations]
       responses:
-        '204':
-          description: Cancelada correctamente
+        '200':
+          description: Reserva cancelada correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Reserva 1 cancelada correctamente"
         '404':
           $ref: '#/components/responses/NotFound'
 
