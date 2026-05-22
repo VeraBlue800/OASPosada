@@ -1,10 +1,13 @@
 package com.posada.api.service;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
+import com.posada.api.entity.ReservationEntity;
+import com.posada.api.mapper.ReservationMapper;
 import com.posada.api.model.Reservation;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import jakarta.ws.rs.core.Response;
 import org.jboss.logging.Logger;
 
@@ -13,28 +16,21 @@ public class ReservationService {
 
     private static final Logger LOG = Logger.getLogger(ReservationService.class);
 
-    private final List<Reservation> reservations = new ArrayList<>(List.of(
-            crearReservation("1", "101", LocalDate.of(2025, 6, 1), LocalDate.of(2025, 6, 5)),
-            crearReservation("2", "102", LocalDate.of(2025, 6, 10), LocalDate.of(2025, 6, 15))
-    ));
-
-    private Reservation crearReservation(String guestId, String roomId, LocalDate checkIn, LocalDate checkOut) {
-        Reservation r = new Reservation();
-        r.setGuestId(guestId);
-        r.setRoomId(roomId);
-        r.setCheckIn(checkIn);
-        r.setCheckOut(checkOut);
-        return r;
-    }
+    @Inject
+    EntityManager em;
 
     public Reservation createReservation(Reservation reservation) {
         LOG.infof("Service - Intentando crear reserva para huésped: %s", reservation.getGuestId());
 
-        boolean exists = reservations.stream()
-                .anyMatch(r -> r.getGuestId().equals(reservation.getGuestId())
-                        && r.getRoomId().equals(reservation.getRoomId())
-                        && r.getCheckIn().equals(reservation.getCheckIn()));
-        if (exists) {
+        List<ReservationEntity> existing = em.createQuery(
+                "FROM ReservationEntity r WHERE r.guestId = :guestId AND r.roomNumber = :roomNumber AND r.checkIn = :checkIn",
+                ReservationEntity.class)
+                .setParameter("guestId", Integer.parseInt(reservation.getGuestId()))
+                .setParameter("roomNumber", Integer.parseInt(reservation.getRoomId()))
+                .setParameter("checkIn", reservation.getCheckIn())
+                .getResultList();
+
+        if (!existing.isEmpty()) {
             LOG.warnf("Service - Conflicto: ya existe una reserva para huésped %s en habitación %s",
                     reservation.getGuestId(), reservation.getRoomId());
             throw new jakarta.ws.rs.ClientErrorException(
@@ -42,21 +38,24 @@ public class ReservationService {
                     Response.Status.CONFLICT);
         }
 
-        Reservation response = crearReservation(
-                reservation.getGuestId(),
-                reservation.getRoomId(),
-                reservation.getCheckIn(),
-                reservation.getCheckOut());
+        ReservationEntity entity = ReservationMapper.toEntity(reservation);
+        persistReservation(entity);
 
-        reservations.add(response);
+        LOG.infof("Service - Reserva creada para habitación: %s", reservation.getRoomId());
+        return ReservationMapper.toModel(entity);
+    }
 
-        LOG.infof("Service - Reserva creada para habitación: %s", response.getRoomId());
-        return response;
+    @Transactional
+    void persistReservation(ReservationEntity entity) {
+        em.persist(entity);
     }
 
     public List<Reservation> getAllReservations() {
-        LOG.infof("Service - Obteniendo todas las reservas, total: %d", reservations.size());
-        return new ArrayList<>(reservations);
+        LOG.info("Service - Obteniendo todas las reservas");
+        List<ReservationEntity> entities = em.createQuery("FROM ReservationEntity", ReservationEntity.class)
+                .getResultList();
+        LOG.infof("Service - Total reservas encontradas: %d", entities.size());
+        return entities.stream().map(ReservationMapper::toModel).toList();
     }
 
     public Reservation getReservationById(String reservationId) {
@@ -67,15 +66,16 @@ public class ReservationService {
             throw new jakarta.ws.rs.BadRequestException("El ID debe ser un número entero válido");
         }
 
-        return reservations.stream()
-                .filter(r -> r.getGuestId().equals(reservationId))
-                .findFirst()
-                .orElseThrow(() -> {
-                    LOG.warnf("Service - Reserva no encontrada con ID: %s", reservationId);
-                    return new jakarta.ws.rs.NotFoundException("Reserva no encontrada con ID: " + reservationId);
-                });
+        ReservationEntity entity = em.find(ReservationEntity.class, Integer.parseInt(reservationId));
+        if (entity == null) {
+            LOG.warnf("Service - Reserva no encontrada con ID: %s", reservationId);
+            throw new jakarta.ws.rs.NotFoundException("Reserva no encontrada con ID: " + reservationId);
+        }
+
+        return ReservationMapper.toModel(entity);
     }
 
+    @Transactional
     public Reservation updateReservation(String reservationId, Reservation reservation) {
         LOG.infof("Service - Intentando actualizar reserva con ID: %s", reservationId);
 
@@ -84,23 +84,22 @@ public class ReservationService {
             throw new jakarta.ws.rs.BadRequestException("El ID debe ser un número entero válido: " + reservationId);
         }
 
-        Reservation existing = reservations.stream()
-                .filter(r -> r.getGuestId().equals(reservationId))
-                .findFirst()
-                .orElseThrow(() -> {
-                    LOG.warnf("Service - Reserva no encontrada con ID: %s", reservationId);
-                    return new jakarta.ws.rs.NotFoundException("Reserva no encontrada con ID: " + reservationId);
-                });
+        ReservationEntity entity = em.find(ReservationEntity.class, Integer.parseInt(reservationId));
+        if (entity == null) {
+            LOG.warnf("Service - Reserva no encontrada con ID: %s", reservationId);
+            throw new jakarta.ws.rs.NotFoundException("Reserva no encontrada con ID: " + reservationId);
+        }
 
-        existing.setGuestId(reservation.getGuestId());
-        existing.setRoomId(reservation.getRoomId());
-        existing.setCheckIn(reservation.getCheckIn());
-        existing.setCheckOut(reservation.getCheckOut());
+        entity.setGuestId(Integer.parseInt(reservation.getGuestId()));
+        entity.setRoomNumber(Integer.parseInt(reservation.getRoomId()));
+        entity.setCheckIn(reservation.getCheckIn());
+        entity.setCheckOut(reservation.getCheckOut());
 
         LOG.infof("Service - Reserva %s actualizada correctamente", reservationId);
-        return existing;
+        return ReservationMapper.toModel(entity);
     }
 
+    @Transactional
     public void deleteReservation(String reservationId) {
         LOG.infof("Service - Intentando cancelar reserva con ID: %s", reservationId);
 
@@ -109,15 +108,13 @@ public class ReservationService {
             throw new jakarta.ws.rs.BadRequestException("El ID debe ser un número entero válido: " + reservationId);
         }
 
-        Reservation existing = reservations.stream()
-                .filter(r -> r.getGuestId().equals(reservationId))
-                .findFirst()
-                .orElseThrow(() -> {
-                    LOG.warnf("Service - Reserva no encontrada con ID: %s", reservationId);
-                    return new jakarta.ws.rs.NotFoundException("Reserva no encontrada con ID: " + reservationId);
-                });
+        ReservationEntity entity = em.find(ReservationEntity.class, Integer.parseInt(reservationId));
+        if (entity == null) {
+            LOG.warnf("Service - Reserva no encontrada con ID: %s", reservationId);
+            throw new jakarta.ws.rs.NotFoundException("Reserva no encontrada con ID: " + reservationId);
+        }
 
-        reservations.remove(existing);
+        em.remove(entity);
         LOG.infof("Service - Reserva %s cancelada correctamente", reservationId);
     }
 }
