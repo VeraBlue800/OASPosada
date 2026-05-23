@@ -16,6 +16,21 @@ services:
     networks:
       - posada-network
 
+  posada-app:
+    image: sodasi/posada-api:latest
+    container_name: posada-app
+    platform: linux/amd64
+    environment:
+      QUARKUS_DATASOURCE_USERNAME: posada_user
+      QUARKUS_DATASOURCE_PASSWORD: posada_password
+      QUARKUS_DATASOURCE_JDBC_URL: jdbc:mysql://mysql:3306/posada_db
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mysql
+    networks:
+      - posada-network
+
 volumes:
   mysql-data:
 
