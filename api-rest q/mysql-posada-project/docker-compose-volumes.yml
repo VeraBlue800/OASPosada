@@ -15,9 +15,14 @@ services:
       - ./init-scripts:/docker-entrypoint-initdb.d:ro
     networks:
       - posada-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "posada_user", "-pposada_password"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   posada-app:
-    image: sodasi/posada-api:latest
+    image: lup1ta/posada-api:1.0.1
     container_name: posada-app
     platform: linux/amd64
     environment:
@@ -27,7 +32,8 @@ services:
     ports:
       - "8081:8081"
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
     networks:
       - posada-network
 
