@@ -18,6 +18,7 @@ public class ReservationMapper {
     // Convierte de Entity (BD) a modelo (API)
     public static Reservation toModel(ReservationEntity entity) {
         Reservation reservation = new Reservation();
+        reservation.setId(entity.getId());
         reservation.setGuestId(String.valueOf(entity.getGuestId()));
         reservation.setRoomId(String.valueOf(entity.getRoomNumber()));
         reservation.setCheckIn(entity.getCheckIn());

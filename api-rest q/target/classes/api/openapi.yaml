@@ -218,13 +218,11 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Reserva para habitación 101 creada"
+                $ref: '#/components/schemas/ReservationResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
         '409':
           description: Reserva ya existe
           content:
@@ -244,7 +242,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Reservation'
+                  $ref: '#/components/schemas/ReservationResponse'
 
   /reservations/{reservationId}:
     parameters:
@@ -260,7 +258,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Reservation'
+                $ref: '#/components/schemas/ReservationResponse'
         '404':
           $ref: '#/components/responses/NotFound'
 
@@ -280,11 +278,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Reserva 1 actualizada correctamente"
+                $ref: '#/components/schemas/ReservationResponse'
         '400':
           $ref: '#/components/responses/BadRequest'
         '404':
@@ -440,14 +434,29 @@ components:
       properties:
         guestId:
           type: string
+          pattern: "^[0-9]+$"
+          example: "2"
         roomId:
           type: string
+          pattern: "^[0-9]+$"
+          example: "101"
         checkIn:
           type: string
           format: date
+          example: "2026-06-01"
         checkOut:
           type: string
           format: date
+          example: "2026-06-05"
+
+    ReservationResponse:
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+        - $ref: '#/components/schemas/Reservation'
 
     Payment:
       type: object

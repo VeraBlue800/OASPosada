@@ -43,6 +43,9 @@ import org.hibernate.validator.constraints.*;
 })
 @jakarta.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2026-04-22T20:27:17.941286200-06:00[America/Mexico_City]")
 public class Reservation {
+  public static final String JSON_PROPERTY_ID = "id";
+  private Integer id;
+
   public static final String JSON_PROPERTY_GUEST_ID = "guestId";
   private String guestId;
 
@@ -57,6 +60,12 @@ public class Reservation {
 
   public Reservation() { 
   }
+
+  public Integer getId() { return id; }
+
+  @JsonProperty(JSON_PROPERTY_ID)
+  @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
+  public void setId(Integer id) { this.id = id; }
 
   public Reservation guestId(String guestId) {
     this.guestId = guestId;
@@ -268,4 +277,3 @@ public class Reservation {
     return joiner.toString();
   }
 }
-

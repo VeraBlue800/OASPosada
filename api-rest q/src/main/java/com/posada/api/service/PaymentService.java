@@ -2,6 +2,7 @@ package com.posada.api.service;
 
 import java.util.List;
 import com.posada.api.entity.PaymentEntity;
+import com.posada.api.entity.ReservationEntity;
 import com.posada.api.mapper.PaymentMapper;
 import com.posada.api.model.Payment;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -26,20 +27,24 @@ public class PaymentService {
         return count > 0;
     }
 
+    @Transactional
     public Payment createPayment(Payment payment) {
         LOG.infof("Service - Registrando pago para reserva: %s", payment.getReservationId());
 
+        // Validar que la reservación existe
+        ReservationEntity reservation = em.find(ReservationEntity.class, Integer.parseInt(payment.getReservationId()));
+        if (reservation == null) {
+            LOG.warnf("Service - Reservación no encontrada con ID: %s", payment.getReservationId());
+            throw new jakarta.ws.rs.NotFoundException(
+                    "Reservación no encontrada con ID: " + payment.getReservationId());
+        }
+
         PaymentEntity entity = PaymentMapper.toEntity(payment);
-        persistPayment(entity);
+        em.persist(entity);
 
         LOG.infof("Service - Pago registrado con ID: %d, monto: %s via %s",
                 entity.getId(), entity.getAmount(), entity.getMethod());
         return PaymentMapper.toModel(entity);
-    }
-
-    @Transactional
-    void persistPayment(PaymentEntity entity) {
-        em.persist(entity);
     }
 
     public List<Payment> getAllPayments() {

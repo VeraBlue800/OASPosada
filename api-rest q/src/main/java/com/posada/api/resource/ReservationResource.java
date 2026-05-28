@@ -33,10 +33,10 @@ public class ReservationResource {
         LOG.infof("POST /reservations - Solicitud para crear reserva para huésped: %s",
                 reservationRequest.getGuestId());
         Reservation reservationResponse = reservationService.createReservation(reservationRequest);
-        LOG.infof("POST /reservations - Reserva creada para habitación: %s", reservationResponse.getRoomId());
+        LOG.infof("POST /reservations - Reserva creada para habitación: %s",
+                reservationResponse.getRoomId());
         return Response.status(Response.Status.CREATED)
-                .entity("{\"message\": \"Reserva para habitación " + reservationResponse.getRoomId() + " creada\"}")
-                .type(MediaType.APPLICATION_JSON + ";charset=UTF-8")
+                .entity(reservationResponse)
                 .build();
     }
 
@@ -66,10 +66,7 @@ public class ReservationResource {
         LOG.infof("PUT /reservations/%s - Solicitud para actualizar reserva", reservationId);
         Reservation reservationResponse = reservationService.updateReservation(reservationId, reservationRequest);
         LOG.infof("PUT /reservations/%s - Reserva actualizada correctamente", reservationId);
-        return Response.ok()
-                .entity("{\"message\": \"Reserva " + reservationId + " actualizada correctamente\"}")
-                .type(MediaType.APPLICATION_JSON + ";charset=UTF-8")
-                .build();
+        return Response.ok(reservationResponse).build();
     }
 
     @DELETE
