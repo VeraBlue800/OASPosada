@@ -3,6 +3,7 @@ package com.posada.api.service;
 import java.util.List;
 import com.posada.api.entity.GuestEntity;
 import com.posada.api.entity.ReservationEntity;
+import com.posada.api.entity.PaymentEntity;
 import com.posada.api.entity.RoomEntity;
 import com.posada.api.mapper.ReservationMapper;
 import com.posada.api.model.Reservation;
@@ -137,6 +138,19 @@ public class ReservationService {
         if (entity == null) {
             LOG.warnf("Service - Reserva no encontrada con ID: %s", reservationId);
             throw new jakarta.ws.rs.NotFoundException("Reserva no encontrada con ID: " + reservationId);
+        }
+
+        // Verificar si tiene pago registrado
+        Long pagos = em.createQuery(
+                "SELECT COUNT(p) FROM PaymentEntity p WHERE p.reservationId = :id", Long.class)
+                .setParameter("id", Integer.parseInt(reservationId))
+                .getSingleResult();
+
+        if (pagos > 0) {
+            LOG.warnf("Service - No se puede cancelar reserva %s, tiene pago registrado", reservationId);
+            throw new jakarta.ws.rs.ClientErrorException(
+                    "No se puede cancelar una reserva que ya tiene pago registrado",
+                    Response.Status.CONFLICT);
         }
 
         em.remove(entity);
